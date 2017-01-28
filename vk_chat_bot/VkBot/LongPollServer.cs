@@ -3,8 +3,12 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace vk_chat_bot
+namespace VkChatBot
 {
+    /// <summary>
+    /// Interface to vk.com LongPollServer.
+    /// For detailed info look: https://vk.com/dev/using_longpoll
+    /// </summary>
     public class LongPollServer
     {
         public ulong Ts;
@@ -12,6 +16,11 @@ namespace vk_chat_bot
         private string Server;
         public JObject current_state;
 
+        /// <summary>
+        /// LongPollServer needs to be initiated by initial response, 
+        /// obtained from vkApi.Messages.GetLongPollServer() call
+        /// </summary>
+        /// <param name="resp"></param>
         public LongPollServer(VkNet.Model.LongPollServerResponse resp)
         {
             this.Ts = resp.Ts;

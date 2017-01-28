@@ -1,27 +1,50 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Text;
 
-
-namespace vk_chat_bot
+namespace VkChatBot
 {
+    /// <summary>
+    /// Simple interface wrapper to long poll server response
+    /// </summary>
     public class PollServerResponse
     {
+        /// <summary>
+        /// Id of message
+        /// </summary>
         public int messageId;
+        /// <summary>
+        /// Id of peer who sent the message
+        /// </summary>
         public int peerId;
+        /// <summary>
+        /// time of recieving
+        /// </summary>
         public int timestamp;
+        /// <summary>
+        /// subject of message. usually "..."
+        /// </summary>
         public string subject;
+        /// <summary>
+        /// body of message
+        /// </summary>
         public string text;
 
+        /// <summary>
+        /// Creates PollServerResponse object from parsed json object
+        /// </summary>
+        /// <param name="jo">parsed json object</param>
         public PollServerResponse(JObject jo)
         {
-            //Console.WriteLine(  jo.ToString() );
             try
             {
                 messageId = (int)jo["updates"][0][1];
                 peerId = (int)jo["updates"][0][3];
                 timestamp = (int)jo["updates"][0][4];
                 subject = (string)jo["updates"][0][5];
-                text = (string)jo["updates"][0][6];
+                // in order of recieving unicode, reencode text to unicode. Without it windows tends to use win1251
+                byte[] bytes = Encoding.Default.GetBytes((string)jo["updates"][0][6]);
+                text = Encoding.UTF8.GetString(bytes);
             }
             catch (Exception)
             {
