@@ -79,11 +79,11 @@ namespace WarodaiWrapper
         /// <param name="query">Query to look for</param>
         /// <param name="takeResults">Amount of results in output</param>
         /// <returns>List of entries matching the query</returns>
-        public List<WarodaiEntry> LookupSmart(string query, int takeResults)
+        public List<WarodaiEntry> Lookup(string query, int takeResults)
         {
             var result = new List<WarodaiEntry>();
 
-            if (!Regex.IsMatch(query, @"\P{IsCyrillic}"))
+            if (!Regex.IsMatch(query, @"\P{IsCyrillic}") || !Regex.IsMatch(query, @"\P{IsBasicLatin}"))
             {
                 //if user enters russian text, then look only in senses
 

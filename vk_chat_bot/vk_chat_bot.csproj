@@ -57,7 +57,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackgroundProcess.cs" />
     <Compile Include="VkBot\BotRule.cs" />
     <Compile Include="VkBot\LongPollServer.cs" />
     <Compile Include="VkBot\PollServerResponse.cs" />
@@ -72,6 +71,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="dict\edict2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="dict\ewarodaiedict.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

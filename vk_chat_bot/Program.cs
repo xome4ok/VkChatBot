@@ -12,9 +12,10 @@ namespace JapaneseChatBot
         static void Main(string[] args)
         {
             var wa = new Warodai(".\\dict\\ewarodaiedict.txt");
+            var edict2 = new Warodai(".\\dict\\edict2.txt");
 
-            ulong appID = 5785736;                      // ID приложения
-            string email = "xome4ok@yandex.kz";         // email или телефон
+            ulong appID = 4871635;                      // ID приложения
+            string email = "";         // email или телефон
             string pass = "";               // пароль для авторизации
 
             var peerId = 4586435; // my own id
@@ -35,17 +36,36 @@ namespace JapaneseChatBot
                 
                 new BotRule(
                     match: "/warodai",
-                    description: "look something up in warodai dictionary. Usage: /warodai %query%",
+                    description: "искать в словаре warodai. Формат: /warodai слово",
                     act: x =>
                     {
                         try {
                             var q = x.text.Split(new char[] {' ', '\u3000'})[1];
-                            var res = wa.LookupSmart(q, 5);
-                            bot.Say(string.Join("\n",res.Select(r => r.ToString())));
+                            var res = wa.Lookup(q, 5);
+                            var answer = string.Join("\n",res.Select(r => r.ToString()));
+                            bot.Say(answer != "" ? answer : "Ничего не нашлось.");
                             }
                         catch(IndexOutOfRangeException)
                         {
-                            bot.Say("Wrong syntax. Should be: /warodai %query%");
+                            bot.Say("Неверный синтаксис. Надо так: /warodai слово");
+                        }
+                    }
+                    ),
+
+                new BotRule(
+                    match: "/edict",
+                    description: "искать в словаре edict. Формат: /warodai слово",
+                    act: x =>
+                    {
+                        try {
+                            var q = x.text.Split(new char[] {' ', '\u3000'})[1];
+                            var res = edict2.Lookup(q, 5);
+                            var answer = string.Join("\n",res.Select(r => r.ToString()));
+                            bot.Say(answer != "" ? answer : "Ничего не нашлось.");
+                            }
+                        catch(IndexOutOfRangeException)
+                        {
+                            bot.Say("Неверный синтаксис. Надо так: /warodai слово");
                         }
                     }
                     ),
@@ -136,26 +156,26 @@ namespace JapaneseChatBot
 
                 #endregion
 
-                #region /echo rule
-                new BotRule(
-                    match: "/echo",
-                    description: "says back your words",
-                    act: x => bot.Say("Echo command recieved: " + x.text)),
+                #region /echo rule COMMENTED
+                //new BotRule(
+                //    match: "/echo",
+                //    description: "повторяет сказанное",
+                //    act: x => bot.Say("Вот что : " + x.text)),
 
 #endregion
 
-                #region /answer rule
-                new BotRule(
-                    match: "/answer",
-                    description: "recites your message",
-                    act: x => bot.Say("What's up?", x.messageId)
-                    ),
+                #region /answer rule COMMENTED
+                //new BotRule(
+                //    match: "/answer",
+                //    description: "recites your message",
+                //    act: x => bot.Say("What's up?", x.messageId)
+                //    ),
 #endregion
                 
                 #region /help rule
                 new BotRule(
                     match: "/help",
-                    act: x => bot.Say("Available commands:\n" + string.Join("\n",bot.Rules.Where(r => !r.Contains(x.text))))
+                    act: x => bot.Say("Доступные команды:\n" + string.Join("\n",bot.Rules.Where(r => !r.Contains(x.text))))
                     ),
                 #endregion
 
