@@ -47,7 +47,7 @@ namespace VkChatBot
         {
             using (WebClient client = new WebClient())
             {
-                var url = "https://" + Server + "?act=a_check&key=" + Key + "&ts=" + Ts + "&wait=25&version=1";
+                var url = "https://" + Server + "?act=a_check&mode=2&key=" + Key + "&ts=" + Ts + "&wait=25&version=1";
                 var data = await client.DownloadStringTaskAsync(new Uri(url));
                 return data;
             }

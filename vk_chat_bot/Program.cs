@@ -14,17 +14,15 @@ namespace JapaneseChatBot
             var wa = new Warodai(".\\dict\\ewarodaiedict.txt");
             var edict2 = new Warodai(".\\dict\\edict2.txt");
 
-            ulong appID = 4871635;                      // ID приложения
-            string email = "";         // email или телефон
-            string pass = "";               // пароль для авторизации
+            ulong appID = 4871635;
 
-            var peerId = 4586435; // my own id
+            var peerId = 176940828; // my own id
             //var peerId = 2000000000 + 139; // japanese chat id
 
 
-            var bot = new VkBot(appID, email, pass, peerId, botCallback);
+            var bot = new VkBot(appID, botCallback, peerId);
 
-            bot.Say("Привет! Я снова онлайн!");
+            bot.Say("Привет! Словарный бот снова онлайн!", peerId);
 
             bot.RegisterRules(new List<BotRule>
             {
@@ -43,11 +41,11 @@ namespace JapaneseChatBot
                             var q = x.text.Split(new char[] {' ', '\u3000'})[1];
                             var res = wa.Lookup(q, 5);
                             var answer = string.Join("\n",res.Select(r => r.ToString()));
-                            bot.Say(answer != "" ? answer : "Ничего не нашлось.");
+                            bot.Say(answer != "" ? answer : "Ничего не нашлось.",x.peerId);
                             }
                         catch(IndexOutOfRangeException)
                         {
-                            bot.Say("Неверный синтаксис. Надо так: /warodai слово");
+                            bot.Say("Неверный синтаксис. Надо так: /warodai слово",x.peerId);
                         }
                     }
                     ),
@@ -61,11 +59,11 @@ namespace JapaneseChatBot
                             var q = x.text.Split(new char[] {' ', '\u3000'})[1];
                             var res = edict2.Lookup(q, 5);
                             var answer = string.Join("\n",res.Select(r => r.ToString()));
-                            bot.Say(answer != "" ? answer : "Ничего не нашлось.");
+                            bot.Say(answer != "" ? answer : "Ничего не нашлось.", peerId);
                             }
                         catch(IndexOutOfRangeException)
                         {
-                            bot.Say("Неверный синтаксис. Надо так: /warodai слово");
+                            bot.Say("Неверный синтаксис. Надо так: /warodai слово", peerId);
                         }
                     }
                     ),
@@ -151,7 +149,7 @@ namespace JapaneseChatBot
                 new BotRule(
                     match: "/chartest",
                     description: "test characters",
-                    act: x => bot.Say("ひらがな\nカタカナ\n漢字\nlatin\nкириллица\n123")
+                    act: x => bot.Say("ひらがな\nカタカナ\n漢字\nlatin\nкириллица\n123", peerId)
                     ),
 
                 #endregion
@@ -175,7 +173,7 @@ namespace JapaneseChatBot
                 #region /help rule
                 new BotRule(
                     match: "/help",
-                    act: x => bot.Say("Доступные команды:\n" + string.Join("\n",bot.Rules.Where(r => !r.Contains(x.text))))
+                    act: x => bot.Say("Доступные команды:\n" + string.Join("\n",bot.Rules.Where(r => !r.Contains(x.text))), peerId)
                     ),
                 #endregion
 

@@ -29,6 +29,7 @@ namespace VkChatBot
         /// body of message
         /// </summary>
         public string text;
+        public JToken extras;
 
         /// <summary>
         /// Creates PollServerResponse object from parsed json object
@@ -45,6 +46,7 @@ namespace VkChatBot
                 // in order of recieving unicode, reencode text to unicode. Without it windows tends to use win1251
                 byte[] bytes = Encoding.Default.GetBytes((string)jo["updates"][0][6]);
                 text = Encoding.UTF8.GetString(bytes);
+                extras = jo["updates"][0][7];
             }
             catch (Exception)
             {

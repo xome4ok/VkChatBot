@@ -55,7 +55,7 @@ namespace VkChatBot
             // \u3000 is a Japanese space character
             if (r.text.Split(new char[] {' ', '\u3000'})[0] == match)
             {
-                Console.WriteLine("\nACTION > " + r.text + "\n");
+                Console.WriteLine("\nACTION > " + match + "\n");
 
                 act(r);
             }
