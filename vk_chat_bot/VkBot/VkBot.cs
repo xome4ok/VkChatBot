@@ -139,10 +139,8 @@ namespace VkChatBot
                                 .Where(t => (int)t[0] == 4
                                     && (answerAll ? // if it answers all
                                         (int)t[3] != vk.UserId : // then answer everybody except yourself
-                                        (int)t[3] == vk.UserId // else answer only yourself
-                                        )
-                                    && (exclusivePeerId == 0 ?
-                                        true : (int)t[3] == exclusivePeerId) //TODO: probably logic bug here. needs fix
+                                        ((int)t[3] == vk.UserId || (int)t[3] == exclusivePeerId) // else answer only yourself or exclusive peer
+                                        ) //TODO: probably logic bug here. needs fix
                                 )
                                 .Select(c => c).ToList();
 

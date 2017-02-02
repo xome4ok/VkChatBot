@@ -15,24 +15,47 @@ namespace JapaneseChatBot
             var edict2 = new Warodai(".\\dict\\edict2.txt");
             ulong appID = 0;
             int peerId = 0;
+            string token = "";
+
             try
             {
-                if (args.Length != 2)
+                if (args.Length < 3)
                     throw new ArgumentException();
 
-                appID = ulong.Parse(args[0]);
+                if (args.Length == 3 && args[2] == "\\email")
+                {
+                    appID = ulong.Parse(args[0]);
 
-                peerId = int.Parse(args[1]); // my own id
-                                      //var peerId = 2000000000 + 139; // japanese chat id
+                    peerId = int.Parse(args[1]); // my own id
+                                                 //var peerId = 2000000000 + 139; // japanese chat id
+                }
+                else if (args.Length == 4 && args[2] == "\\token")
+                {
+                    appID = ulong.Parse(args[0]);
+
+                    peerId = int.Parse(args[1]); // my own id
+                                                 //var peerId = 2000000000 + 139; // japanese chat 
+                    token = args[3];
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+
+
             }
             catch (Exception)
             {
-                Console.WriteLine("Couldn't parse command line arguments. Usage: vk_chat_bot.exe appId peerId");
+                Console.WriteLine("Couldn't parse command line arguments. Usage: vk_chat_bot.exe appId peerId \\email\n Usage: vk_chat_bot.exe appId peerId \\token token");
+                Console.ReadKey();
+                return;
             }
 
-            var bot = new VkBot(appID, botCallback, peerId);
+            var bot = token == "" ? new VkBot(appID, botCallback, peerId) : new VkBot(appID, token, botCallback, peerId);
 
             bot.Say("Привет! Словарный бот снова онлайн!", peerId);
+
+            Console.WriteLine(string.Format("Successfully started with:\nappid: {0}\npeerid: {1}",appID,peerId));
 
             bot.RegisterRules(new List<BotRule>
             {
@@ -73,7 +96,7 @@ namespace JapaneseChatBot
                             }
                         catch(IndexOutOfRangeException)
                         {
-                            bot.Say("Неверный синтаксис. Надо так: /warodai слово", x.peerId);
+                            bot.Say("Неверный синтаксис. Надо так: /edict слово", x.peerId);
                         }
                     }
                     ),
