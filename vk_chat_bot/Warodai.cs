@@ -83,15 +83,60 @@ namespace WarodaiWrapper
         {
             var result = new List<WarodaiEntry>();
 
-            if (!Regex.IsMatch(query, @"\P{IsCyrillic}") || !Regex.IsMatch(query, @"\P{IsBasicLatin}"))
+            query = query.ToLower();
+
+            if (!Regex.IsMatch(query, @"(\s?[^\s\p{IsCyrillic}])") || !Regex.IsMatch(query, @"(\s?[^\s\p{IsBasicLatin}])"))
             {
-                //if user enters russian text, then look only in senses
+                //if user enters russian or english text, then look only in senses
+                /* 
+                 * descr. from Warodai.ru/help 
+                 * - remove numbers, e.g. "1)"
+                 * - remove everything in brackets, e.g. "(см.)"
+                 * - split on ","
+                 * - match query to splitted portions
+                 * - strong position of word or sentence is full match on one of the splitted portions
+                 * - weak positions are all other matches (partial)
+                 * - entries with query in strong position go in the beginning of the result
+                 */
+
+                Func<string, string[]> cleanAndSplit =
+                    str =>
+                    {
+                        var noNumbers = Regex.Replace(str, @"\d\)", "");
+                        var noBrackets = Regex.Replace(noNumbers, @"\(  # First '('
+                                                    (?:                 
+                                                    [^()]               # Match all non-braces
+                                                    |
+                                                    (?<open> \( )       # Match '(', and capture into 'open'
+                                                    |
+                                                    (?<-open> \) )      # Match ')', and delete the 'open' capture
+                                                    )+
+                                                    (?(open)(?!))       # Fails if 'open' stack isn't empty!
+
+                                                    \)                  # Last ')'"
+                    , "");
+                        var noEndingParen = Regex.Replace(noBrackets, @"\.\)$", "");
+                        var toLower = noEndingParen.ToLower();
+                        var splitted = noEndingParen.Split(',');
+                        return splitted;
+                    };
 
                 // find entries, where query is mentioned as is
-                result = entries.FindAll(x => x.Senses.Any(s => s == query));
+                result = entries.FindAll(x => x.Senses.Any(
+                    s =>
+                    {
+                        var splitted = cleanAndSplit(s);
+                        return splitted.Any(c => c == query);
+                    }
+                ));
 
                 //find the other entries
-                result = result.Union(entries.FindAll(x => x.Senses.Any(s => s.Contains(query)))).ToList();
+                result = result.Union(entries.FindAll(x => x.Senses.Any(
+                    s =>
+                    {
+                        var splitted = cleanAndSplit(s);
+                        return splitted.Any(c => c.Contains(query));
+                    }))).ToList();
             }
             else
             {
@@ -99,13 +144,13 @@ namespace WarodaiWrapper
                 //consider it's kana|kanji and look in Kanjis and Readings first
 
                 //find entries, where query is mentioned as is
-                result = entries.FindAll(x => 
+                result = entries.FindAll(x =>
                                            x.Kanjis.Any(k => k == query)
                                         || x.Readings.Any(r => r == query)
                                         );
 
                 //find entries, where words begin with query
-                result = result.Union(entries.FindAll(x => 
+                result = result.Union(entries.FindAll(x =>
                                              x.Kanjis.Any(k => k.StartsWith(query))
                                           || x.Readings.Any(r => r.StartsWith(query))
                     )).ToList();
@@ -117,6 +162,7 @@ namespace WarodaiWrapper
 
             return result.Take(takeResults).ToList();
         }
+
     }
 
     public class WarodaiEntry

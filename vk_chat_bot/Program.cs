@@ -13,12 +13,22 @@ namespace JapaneseChatBot
         {
             var wa = new Warodai(".\\dict\\ewarodaiedict.txt");
             var edict2 = new Warodai(".\\dict\\edict2.txt");
+            ulong appID = 0;
+            int peerId = 0;
+            try
+            {
+                if (args.Length != 2)
+                    throw new ArgumentException();
 
-            ulong appID = 4871635;
+                appID = ulong.Parse(args[0]);
 
-            var peerId = 176940828; // my own id
-            //var peerId = 2000000000 + 139; // japanese chat id
-
+                peerId = int.Parse(args[1]); // my own id
+                                      //var peerId = 2000000000 + 139; // japanese chat id
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Couldn't parse command line arguments. Usage: vk_chat_bot.exe appId peerId");
+            }
 
             var bot = new VkBot(appID, botCallback, peerId);
 
@@ -59,52 +69,15 @@ namespace JapaneseChatBot
                             var q = x.text.Split(new char[] {' ', '\u3000'})[1];
                             var res = edict2.Lookup(q, 5);
                             var answer = string.Join("\n",res.Select(r => r.ToString()));
-                            bot.Say(answer != "" ? answer : "Ничего не нашлось.", peerId);
+                            bot.Say(answer != "" ? answer : "Ничего не нашлось.", x.peerId);
                             }
                         catch(IndexOutOfRangeException)
                         {
-                            bot.Say("Неверный синтаксис. Надо так: /warodai слово", peerId);
+                            bot.Say("Неверный синтаксис. Надо так: /warodai слово", x.peerId);
                         }
                     }
                     ),
-
-                #region /jedict rule COMMENTED
-                //new BotRule(
-                //    match: "/jedict",
-                //    description: "japanese-english dictionary lookup",
-                //    act: x =>
-                //    {
-                //        try
-                //        {
-                //            byte[] bytes = Encoding.Default.GetBytes(x.text);
-                //            var incomingString = Encoding.UTF8.GetString(bytes);
-                //            var q = incomingString.Split(' ')[1];
-                //            var match = dictEntries.Find(w => w.Kanjis.Any(k => k.Text == q) || w.Readings.Any(r => r.Text == q));
-                //            var rest = dictEntries.FindAll(w => w.Kanjis.Any(k => k.Text.Contains(q))
-                //            || w.Readings.Any(r => r.Text.Contains(q)) 
-                //            //|| w.Senses.Any(s => s.ToString().Contains(q)))
-                //            ).Take(5).Select(e => e.ToString().Split(new string[] { " :: " }, StringSplitOptions.None)[1]).ToList();
-                //            if (match != null)
-                //            {
-                //                var detailedMatch = string.Join(" | ", match.Kanjis.ToList().Select(k => k.Text))
-                //                + " | " + string.Join(" | ",match.Readings.ToList().Select(r => r.Text))
-                //                + " | " + string.Join("; ", match.Senses.ToList().Select(s => s.ToString().Substring(9)));
-
-                //                rest.Add(detailedMatch);
-                //                rest.Reverse();
-                //            }
-
-                //            var reply = string.Join("\n", rest); 
-                //            bot.Say(reply == "" ? "Not found" : reply);
-                //        }
-                //        catch (IndexOutOfRangeException)
-                //        {
-                //            bot.Say("Wrong syntax. Should be: /dict %query%");
-                //        }
-                //    }
-                //    ),
-                #endregion
-
+                
                 #region WIP, commented. /gootran
                 //new BotRule(
                 //    match: "/gootran",
@@ -173,7 +146,7 @@ namespace JapaneseChatBot
                 #region /help rule
                 new BotRule(
                     match: "/help",
-                    act: x => bot.Say("Доступные команды:\n" + string.Join("\n",bot.Rules.Where(r => !r.Contains(x.text))), peerId)
+                    act: x => bot.Say("Доступные команды:\n" + string.Join("\n",bot.Rules.Where(r => !r.Contains(x.text))), x.peerId)
                     ),
                 #endregion
 
@@ -189,7 +162,7 @@ namespace JapaneseChatBot
             Console.WriteLine(r.ToString());
         }
 
-        
+
 
     }
 }

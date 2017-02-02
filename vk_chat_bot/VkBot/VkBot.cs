@@ -126,7 +126,10 @@ namespace VkChatBot
             server = new LongPollServer(firstResponse);
 
             if (exclusivePeerId != 0)
+            {
                 this.exclusivePeerId = exclusivePeerId;
+                this.answerAll = false;
+            }
 
             server.StartPollingAsync(x =>
             {
